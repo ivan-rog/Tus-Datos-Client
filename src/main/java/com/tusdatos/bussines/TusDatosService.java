@@ -54,7 +54,7 @@ public class TusDatosService {
 
     private Mono<JobStatusResponseDTO> jobStatus(final LaunchResponseDTO launchResponseDTO) {
         var uri = this.getUri(this.endpointJobStatus, launchResponseDTO.getJobId());
-        return Flux.interval(Duration.ofSeconds(15)).
+        return Flux.interval(Duration.ofSeconds(30), Duration.ofSeconds(15)).
                 flatMap(i -> this.apiRest.get(uri.toString(), JobStatusResponseDTO.class)).
                 takeUntil(jobStatusResponseDTO -> "finalizado".equals(jobStatusResponseDTO.getStatus())).
                 last().timeout(Duration.ofMinutes(2));
