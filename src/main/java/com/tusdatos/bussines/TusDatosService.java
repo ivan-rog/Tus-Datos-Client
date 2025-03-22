@@ -7,14 +7,17 @@ import com.tusdatos.dto.client.response.ReportJsonResponseDTO;
 import com.tusdatos.dto.client.response.RetryJobResponseDTO;
 import com.tusdatos.rest.APIRest;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.net.URI;
 import java.time.Duration;
 import java.util.List;
 
+@Service
 public class TusDatosService {
 
     private final APIRest apiRest;
@@ -35,6 +38,14 @@ public class TusDatosService {
 
     TusDatosService(APIRest apiRest) {
         this.apiRest = apiRest;
+    }
+
+    public Mono<ReportJsonResponseDTO> processDocuments(final LaunchRequestDTO launchRequestDTO) {
+        return this.launch(launchRequestDTO).
+                flatMap(this::jobStatus).
+                flatMap(this::retryJob).
+                flatMap(this::reportJob).
+                publishOn(Schedulers.boundedElastic());
     }
 
     private Mono<LaunchResponseDTO> launch(final LaunchRequestDTO launchRequestDTO) {
