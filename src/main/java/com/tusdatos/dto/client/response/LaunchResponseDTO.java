@@ -1,0 +1,27 @@
+package com.tusdatos.dto.client.response;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.tusdatos.dto.client.enums.DocumentTypes;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString
+public class LaunchResponseDTO {
+
+    @JsonProperty("email")
+    private String mail;
+    @JsonProperty("doc")
+    private String documentNumber;
+    @JsonProperty("jobid")
+    private String jobId;
+    @JsonProperty("nombre")
+    private String name;
+    @JsonProperty("typedoc")
+    private DocumentTypes documentType;
+    @JsonProperty("validado")
+    private boolean validated;
+
+}
