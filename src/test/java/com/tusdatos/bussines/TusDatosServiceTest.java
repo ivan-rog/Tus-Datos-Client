@@ -51,7 +51,7 @@ class TusDatosServiceTest {
     void when_process_the_CC_111_document() throws JsonProcessingException {
         this.enqueueResponseCC111();
         StepVerifier.create(this.tusDatosService.processDocuments(LaunchMock.launchRequestCC111()))
-                .expectNextMatches(reportJsonResponseDTO -> "111-1".equals(reportJsonResponseDTO.getRut()))
+                .expectNextMatches(reportJsonResponseDTO -> "111-1".equals(reportJsonResponseDTO.rut()))
                 .verifyComplete();
     }
 
@@ -85,7 +85,7 @@ class TusDatosServiceTest {
     void when_the_service_returns_a_500_error() throws JsonProcessingException {
         mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
         StepVerifier.create(this.tusDatosService.processDocuments(LaunchMock.launchRequestCC111()))
-                .expectErrorMatches(throwable -> ((WebClientResponseException) throwable).getStatusCode().is5xxServerError())
+                .expectErrorMatches(Exceptions::isRetryExhausted)
                 .verify();
     }
 
