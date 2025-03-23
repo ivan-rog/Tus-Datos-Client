@@ -5,19 +5,25 @@ import com.tusdatos.configuration.WebClientConfig;
 import com.tusdatos.rest.TusDatosApiRest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.SocketPolicy;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunctions;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.Exceptions;
 import reactor.test.StepVerifier;
 
 import java.io.IOException;
 
 @ExtendWith(MockitoExtension.class)
+@Execution(ExecutionMode.CONCURRENT)
 class TusDatosServiceTest {
 
     private MockWebServer mockWebServer;
@@ -67,5 +73,27 @@ class TusDatosServiceTest {
         );
     }
 
+    @Test
+    void when_the_service_has_timeout() throws JsonProcessingException {
+        mockWebServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.NO_RESPONSE));
+        StepVerifier.create(this.tusDatosService.processDocuments(LaunchMock.launchRequestCC111()))
+                .expectErrorMatches(Exceptions::isRetryExhausted)
+                .verify();
+    }
 
+    @Test
+    void when_the_service_returns_a_500_error() throws JsonProcessingException {
+        mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        StepVerifier.create(this.tusDatosService.processDocuments(LaunchMock.launchRequestCC111()))
+                .expectErrorMatches(throwable -> ((WebClientResponseException) throwable).getStatusCode().is5xxServerError())
+                .verify();
+    }
+
+    @Test
+    void when_the_service_returns_a_401_error() throws JsonProcessingException {
+        mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.UNAUTHORIZED.value()));
+        StepVerifier.create(this.tusDatosService.processDocuments(LaunchMock.launchRequestCC111()))
+                .expectErrorMatches(throwable -> ((WebClientResponseException) throwable).getStatusCode().is4xxClientError())
+                .verify();
+    }
 }
