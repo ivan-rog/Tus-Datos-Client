@@ -16,7 +16,7 @@ import java.time.Duration;
 
 @Slf4j
 @Service
-public final class TusDatosApiRest implements APIRest {
+public final class TusDatosApiRest implements ApiRestClient {
 
     private final WebClient webClient;
 

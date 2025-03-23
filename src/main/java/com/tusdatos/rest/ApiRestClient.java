@@ -2,7 +2,7 @@ package com.tusdatos.rest;
 
 import reactor.core.publisher.Mono;
 
-public interface APIRest {
+public interface ApiRestClient {
 
     <T> Mono<T> get(final String uri, final Class<T> responseType);
 
