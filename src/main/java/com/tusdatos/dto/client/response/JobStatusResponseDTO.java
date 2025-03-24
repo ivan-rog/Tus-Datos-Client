@@ -6,7 +6,7 @@ import com.tusdatos.dto.client.enums.DocumentTypes;
 
 import java.util.List;
 
-@JsonIgnoreProperties
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record JobStatusResponseDTO(
         String cedula,
         boolean error,
@@ -16,7 +16,7 @@ public record JobStatusResponseDTO(
         @JsonProperty("hallazgos") String findings,
         String id,
         @JsonProperty("nombre") String name,
-        Object result,
+        Object results,
         long time,
         @JsonProperty("typedoc") DocumentTypes documentTypes,
         @JsonProperty("validado") boolean validated
