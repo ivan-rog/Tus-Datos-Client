@@ -61,7 +61,8 @@ public final class TusDatosApiRest implements ApiRestClient {
                                             case ConnectTimeoutException ignored -> true;
                                             default -> false;
                                         }
-                                ))
+                                )
+                                .doAfterRetry(retrySignal -> log.warn("Retrying request: {} times, by: {}", retrySignal.totalRetries(), retrySignal.failure().getMessage())))
                         .doOnError(ex -> log.error("Error: ", ex)).log()
         );
     }

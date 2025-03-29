@@ -87,6 +87,8 @@ class TusDatosServiceTest {
     @Tag("tus_datos")
     void when_the_service_returns_a_500_error() {
         mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
         StepVerifier.create(this.tusDatosService.processDocuments(LaunchMock.launchRequestCC111()))
                 .expectErrorMatches(Exceptions::isRetryExhausted)
                 .verify();
