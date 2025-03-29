@@ -12,6 +12,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
+import java.net.ConnectException;
 import java.time.Duration;
 
 @Slf4j
@@ -48,13 +49,16 @@ public final class TusDatosApiRest implements ApiRestClient {
     private <T> Mono<T> additional(Mono<T> request) {
         return request.transform(mono ->
                 mono.retryWhen(Retry.backoff(3, Duration.ofSeconds(5))
-                                .filter(throwable -> switch (throwable) {
-                                            case ConnectTimeoutException ignored -> true;
+                                .filter(throwable ->
+                                        switch (throwable) {
+                                            case WebClientRequestException e ->
+                                                    e.getCause() instanceof ConnectException ||
+                                                            e.getCause() instanceof TimeoutException;
+                                            case WebClientResponseException e ->
+                                                    e.getStatusCode().is5xxServerError()
+                                                            || e.getCause() instanceof TimeoutException;
                                             case TimeoutException ignored -> true;
-                                            case WebClientResponseException webClientResponseException ->
-                                                    webClientResponseException.getStatusCode().is5xxServerError();
-                                            case WebClientRequestException webClientRequestException ->
-                                                    webClientRequestException.getCause() instanceof TimeoutException;
+                                            case ConnectTimeoutException ignored -> true;
                                             default -> false;
                                         }
                                 ))

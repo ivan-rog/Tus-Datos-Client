@@ -6,14 +6,18 @@ import com.tusdatos.utils.JacksonUtils;
 
 public class LaunchMock {
 
-    public static LaunchRequestDTO launchRequestCC111() throws JsonProcessingException {
-        return JacksonUtils.jsonToObject("""
-                {\s
-                    "doc": 111,\s
-                    "typedoc": "CC",\s
-                    "fechaE": "01/12/2014"\s
-                }
-                """, LaunchRequestDTO.class);
+    public static LaunchRequestDTO launchRequestCC111() {
+        try {
+            return JacksonUtils.jsonToObject("""
+                    {\s
+                        "doc": 111,\s
+                        "typedoc": "CC",\s
+                        "fechaE": "01/12/2014"\s
+                    }
+                    """, LaunchRequestDTO.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static String launchResponseCC111()  {

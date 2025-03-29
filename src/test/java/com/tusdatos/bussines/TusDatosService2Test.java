@@ -54,13 +54,7 @@ class TusDatosService2Test {
                 .thenReturn(Mono.just(JacksonUtils.jsonToObject(ReportJson.reportJsonCC111(), ReportJsonResponseDTO.class)));
 
         StepVerifier.withVirtualTime(
-                () -> {
-                    try {
-                        return tusDatosService.processDocuments(LaunchMock.launchRequestCC111());
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-                }).expectSubscription()
+                () -> tusDatosService.processDocuments(LaunchMock.launchRequestCC111())).expectSubscription()
                 .expectNoEvent(Duration.ofSeconds(30))
                 .expectNextMatches(reportJsonResponseDTO -> "111-1".equals(reportJsonResponseDTO.rut()))
                 .verifyComplete();

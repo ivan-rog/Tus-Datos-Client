@@ -1,6 +1,5 @@
 package com.tusdatos.bussines;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.tusdatos.configuration.WebClientConfig;
 import com.tusdatos.rest.TusDatosApiRest;
 import okhttp3.mockwebserver.MockResponse;
@@ -8,6 +7,7 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.SocketPolicy;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.Execution;
@@ -48,7 +48,8 @@ class TusDatosServiceTest {
     }
 
     @Test
-    void when_process_the_CC_111_document() throws JsonProcessingException {
+    @Tag("tus_datos")
+    void when_process_the_CC_111_document() {
         this.enqueueResponseCC111();
         StepVerifier.create(this.tusDatosService.processDocuments(LaunchMock.launchRequestCC111()))
                 .expectNextMatches(reportJsonResponseDTO -> "111-1".equals(reportJsonResponseDTO.rut()))
@@ -74,7 +75,8 @@ class TusDatosServiceTest {
     }
 
     @Test
-    void when_the_service_has_timeout() throws JsonProcessingException {
+    @Tag("tus_datos")
+    void when_the_service_has_timeout() {
         mockWebServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.NO_RESPONSE));
         StepVerifier.create(this.tusDatosService.processDocuments(LaunchMock.launchRequestCC111()))
                 .expectErrorMatches(Exceptions::isRetryExhausted)
@@ -82,7 +84,8 @@ class TusDatosServiceTest {
     }
 
     @Test
-    void when_the_service_returns_a_500_error() throws JsonProcessingException {
+    @Tag("tus_datos")
+    void when_the_service_returns_a_500_error() {
         mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
         StepVerifier.create(this.tusDatosService.processDocuments(LaunchMock.launchRequestCC111()))
                 .expectErrorMatches(Exceptions::isRetryExhausted)
@@ -90,7 +93,8 @@ class TusDatosServiceTest {
     }
 
     @Test
-    void when_the_service_returns_a_401_error() throws JsonProcessingException {
+    @Tag("tus_datos")
+    void when_the_service_returns_a_401_error() {
         mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.UNAUTHORIZED.value()));
         StepVerifier.create(this.tusDatosService.processDocuments(LaunchMock.launchRequestCC111()))
                 .expectErrorMatches(throwable -> ((WebClientResponseException) throwable).getStatusCode().is4xxClientError())
